@@ -1,6 +1,7 @@
 import express from 'express';
 import { ethers } from 'ethers';
 import dotenv from 'dotenv';
+import { trackRequest, trackPayment, getStats } from './stats.js';
 dotenv.config();
 
 const app = express();
@@ -81,6 +82,7 @@ for (const [path, pricing] of Object.entries(PRICES)) {
     const txHash = req.headers['x-payment'] || req.headers['x-arc-payment'];
 
     if (!txHash) {
+      trackRequest(path, 402);
       return res.status(402).json({
         status: 402,
         message: 'Payment Required',
@@ -105,6 +107,9 @@ for (const [path, pricing] of Object.entries(PRICES)) {
       const verifyTime = Date.now() - start;
 
       if (!verification.valid) {
+        trackRequest(path, 402);
+      trackRequest(path, 402);
+        trackPayment(false, 0, 'unknown', txHash, path, 0, 0);
         return res.status(402).json({ status: 402, message: `Payment failed: ${verification.reason}`, tx_hash: txHash });
       }
 
@@ -120,6 +125,7 @@ for (const [path, pricing] of Object.entries(PRICES)) {
       const solverData = await solverRes.json();
       const solveTime = Date.now() - solverStart;
 
+      trackPayment(true, verification.amount, verification.from, txHash, path, verifyTime, solveTime);
       console.log(`[ARC] Solver in ${solveTime}ms: ${solverData.status}`);
 
       return res.json({
@@ -161,6 +167,8 @@ app.get('/.well-known/x402', (req, res) => {
   }
   res.json({ service: 'OptimEngine', version: 'arc-native-1.0.0', facilitator: 'native-middleware', endpoints });
 });
+
+app.get('/stats', (req, res) => { res.json(getStats()); });
 
 app.get('/docs', (req, res) => {
   res.json({

@@ -1,11 +1,13 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import { ethers } from 'ethers';
 import dotenv from 'dotenv';
 import { trackRequest, trackPayment, getStats } from './stats.js';
 dotenv.config();
 
 const app = express();
+app.use(helmet());
 app.use(express.json());
 
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 60, message: { status: 429, message: 'Too many requests. Max 60/minute.' } });

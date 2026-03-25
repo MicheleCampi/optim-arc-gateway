@@ -119,7 +119,7 @@ for (const [path, pricing] of Object.entries(PRICES)) {
       const solverStart = Date.now();
       const solverRes = await fetch(`${OPTIMENGINE_URL}${solverPath}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Engine-Key': process.env.ENGINE_API_KEY || '' },
         body: JSON.stringify(req.body)
       });
       const solverData = await solverRes.json();

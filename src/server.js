@@ -1,4 +1,5 @@
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { ethers } from 'ethers';
 import dotenv from 'dotenv';
 import { trackRequest, trackPayment, getStats } from './stats.js';
@@ -6,6 +7,12 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+
+const limiter = rateLimit({ windowMs: 60 * 1000, max: 60, message: { status: 429, message: 'Too many requests. Max 60/minute.' } });
+const strictLimiter = rateLimit({ windowMs: 60 * 1000, max: 10, message: { status: 429, message: 'Too many unpaid requests. Max 10/minute.' } });
+app.use('/solve', limiter);
+app.use('/health', rateLimit({ windowMs: 60 * 1000, max: 30 }));
+app.use('/stats', rateLimit({ windowMs: 60 * 1000, max: 10 }));
 
 const {
   ARC_RPC_URL, ARC_CHAIN_ID, USDC_ADDRESS, USDC_DECIMALS,

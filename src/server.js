@@ -129,7 +129,7 @@ for (const [path, pricing] of Object.entries(PRICES)) {
       const solverRes = await fetch(`${OPTIMENGINE_URL}${solverPath}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Engine-Key': process.env.ENGINE_API_KEY || '' },
-        body: JSON.stringify(req.body)
+        body: JSON.stringify(solverPath === '/optimize_routing' ? { allow_drop_visits: true, ...req.body } : req.body)
       });
       const solverData = await solverRes.json();
       const solveTime = Date.now() - solverStart;

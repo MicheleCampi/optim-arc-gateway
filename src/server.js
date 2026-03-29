@@ -179,6 +179,12 @@ app.get('/.well-known/x402', (req, res) => {
 
 app.get('/stats', (req, res) => { res.json(getStats()); });
 
+app.get('/docs/templates', (_req, res) => {
+  import('fs').then(fs => {
+    const templates = JSON.parse(fs.readFileSync('docs/prediction-market-templates.json', 'utf8'));
+    res.json(templates);
+  });
+});
 app.get('/docs', (req, res) => {
   res.json({
     service: 'OptimEngine Arc Gateway',

@@ -1,0 +1,98 @@
+{
+  "title": "OptimEngine Prediction Market Templates",
+  "description": "Ready-to-use templates for AI agents trading on Polymarket/Kalshi. LLM does reasoning, OptimEngine does math.",
+  "pipeline_total_cost": "$0.90 for complete quantitative analysis",
+  "templates": [
+    {
+      "name": "Stochastic CVaR Analysis",
+      "endpoint": "POST /solve/stochastic",
+      "price": "$0.25",
+      "use_case": "Quantify risk of prediction market portfolio with uncertain outcomes",
+      "example_input": {
+        "solver_type": "scheduling",
+        "num_scenarios": 50,
+        "optimize_for": "cvar_95",
+        "solver_request": {
+          "jobs": [
+            {"job_id": "POS-FED-RATE", "name": "Fed rate cut — est 60%", "priority": 8, "tasks": [{"task_id": "execution", "duration": 5, "eligible_machines": ["POOL-A", "POOL-B"]}]},
+            {"job_id": "POS-BTC-100K", "name": "BTC above 100K — est 45%", "priority": 5, "tasks": [{"task_id": "execution", "duration": 4, "eligible_machines": ["POOL-A", "POOL-B", "POOL-C"]}]},
+            {"job_id": "POS-AI-MODEL", "name": "Anthropic best AI — est 80%", "priority": 9, "tasks": [{"task_id": "execution", "duration": 3, "eligible_machines": ["POOL-B", "POOL-C"]}]}
+          ],
+          "machines": [{"machine_id": "POOL-A"}, {"machine_id": "POOL-B"}, {"machine_id": "POOL-C"}]
+        },
+        "stochastic_parameters": [
+          {"parameter_path": "jobs[POS-FED-RATE].tasks[execution].duration", "distribution": "normal", "mean": 5, "std_dev": 2},
+          {"parameter_path": "jobs[POS-BTC-100K].tasks[execution].duration", "distribution": "log_normal", "mean": 4, "std_dev": 2},
+          {"parameter_path": "jobs[POS-AI-MODEL].tasks[execution].duration", "distribution": "triangular", "min_value": 1, "mode_value": 3, "max_value": 8}
+        ]
+      },
+      "what_you_learn": ["CVaR 95% worst-case exposure", "Expected vs CVaR gap (risk premium)", "Distribution stats", "Probability of infeasibility"]
+    },
+    {
+      "name": "Portfolio Pareto Optimization",
+      "endpoint": "POST /solve/pareto",
+      "price": "$0.20",
+      "use_case": "Trade-off between risk and return across positions",
+      "example_input": {
+        "solver_type": "scheduling",
+        "num_points": 8,
+        "objectives": [{"name": "minimize_makespan", "weight": 1}, {"name": "minimize_total_tardiness", "weight": 1}],
+        "solver_request": {
+          "jobs": [
+            {"job_id": "HIGH-RISK", "name": "High-risk 3x return", "priority": 5, "due_date": 10, "tasks": [{"task_id": "settle", "duration": 7, "eligible_machines": ["MKT-1", "MKT-2"]}]},
+            {"job_id": "MED-RISK", "name": "Medium-risk 1.5x", "priority": 7, "due_date": 15, "tasks": [{"task_id": "settle", "duration": 4, "eligible_machines": ["MKT-1", "MKT-2", "MKT-3"]}]},
+            {"job_id": "LOW-RISK", "name": "Low-risk 1.1x", "priority": 9, "due_date": 8, "tasks": [{"task_id": "settle", "duration": 2, "eligible_machines": ["MKT-2", "MKT-3"]}]},
+            {"job_id": "HEDGE", "name": "Hedge inverse", "priority": 6, "due_date": 12, "tasks": [{"task_id": "settle", "duration": 3, "eligible_machines": ["MKT-1", "MKT-3"]}]}
+          ],
+          "machines": [{"machine_id": "MKT-1"}, {"machine_id": "MKT-2"}, {"machine_id": "MKT-3"}]
+        }
+      },
+      "what_you_learn": ["Pareto frontier (non-dominated solutions)", "Trade-off ratios", "Correlation between objectives", "Balanced solution"]
+    },
+    {
+      "name": "Sensitivity Fragility Check",
+      "endpoint": "POST /solve/sensitivity",
+      "price": "$0.15",
+      "use_case": "Which probability estimate is most fragile?",
+      "example_input": {
+        "solver_type": "scheduling",
+        "solver_request": {
+          "jobs": [
+            {"job_id": "FED-RATE", "priority": 8, "due_date": 15, "tasks": [{"task_id": "trade", "duration": 6, "eligible_machines": ["DESK-1", "DESK-2"]}]},
+            {"job_id": "BTC-PRICE", "priority": 5, "tasks": [{"task_id": "trade", "duration": 4, "eligible_machines": ["DESK-1", "DESK-2"]}]},
+            {"job_id": "AI-WINNER", "priority": 9, "due_date": 10, "tasks": [{"task_id": "trade", "duration": 3, "eligible_machines": ["DESK-2", "DESK-3"]}]}
+          ],
+          "machines": [{"machine_id": "DESK-1"}, {"machine_id": "DESK-2"}, {"machine_id": "DESK-3"}]
+        },
+        "parameters": [
+          {"parameter_path": "jobs[FED-RATE].tasks[trade].duration", "perturbations": [-30, -20, -10, 10, 20, 30]},
+          {"parameter_path": "jobs[BTC-PRICE].tasks[trade].duration", "perturbations": [-50, -25, 25, 50]},
+          {"parameter_path": "jobs[AI-WINNER].tasks[trade].duration", "perturbations": [-20, -10, 10, 20]}
+        ]
+      },
+      "what_you_learn": ["Sensitivity score 0-100 per parameter", "Elasticity (amplifying if >1)", "Critical flag", "Risk ranking"]
+    },
+    {
+      "name": "Prescriptive Strategy + Forecast",
+      "endpoint": "POST /solve/prescriptive",
+      "price": "$0.30",
+      "use_case": "Forecast from historical data + optimize strategy + risk + recommendations",
+      "example_input": {
+        "solver_type": "scheduling",
+        "risk_appetite": "moderate",
+        "solver_request": {
+          "jobs": [
+            {"job_id": "POS-1", "priority": 8, "tasks": [{"task_id": "execute", "duration": 5, "eligible_machines": ["VENUE-A", "VENUE-B"]}]},
+            {"job_id": "POS-2", "priority": 5, "tasks": [{"task_id": "execute", "duration": 3, "eligible_machines": ["VENUE-A", "VENUE-B"]}]}
+          ],
+          "machines": [{"machine_id": "VENUE-A"}, {"machine_id": "VENUE-B"}]
+        },
+        "forecast_parameters": [
+          {"parameter_path": "jobs[POS-1].tasks[execute].duration", "historical_data": [{"period":0,"value":3},{"period":1,"value":4},{"period":2,"value":5},{"period":3,"value":4},{"period":4,"value":6},{"period":5,"value":7}], "forecast_method": "exponential_smoothing"},
+          {"parameter_path": "jobs[POS-2].tasks[execute].duration", "historical_data": [{"period":0,"value":5},{"period":1,"value":4},{"period":2,"value":3},{"period":3,"value":4},{"period":4,"value":3},{"period":5,"value":2}], "forecast_method": "linear_trend"}
+        ]
+      },
+      "what_you_learn": ["Forecast with confidence intervals", "Trend analysis", "Optimized schedule", "Risk across scenarios", "Prioritized action list"]
+    }
+  ]
+}

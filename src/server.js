@@ -1,5 +1,6 @@
 import express from 'express';
 import { predictStrategy } from './predict-strategy.js';
+import { routeLiquidity } from './route-liquidity.js';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { ethers } from 'ethers';
@@ -35,6 +36,7 @@ const PRICES = {
   '/solve/prescriptive':{ price: '0.30', raw: 300000n },
   '/solve/validate':    { price: '0.05', raw: 50000n },
   '/predict-strategy':  { price: '0.80', raw: 800000n },
+  '/route-liquidity':   { price: '0.35', raw: 350000n },
 };
 
 const SOLVER_MAP = {

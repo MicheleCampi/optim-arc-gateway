@@ -1,4 +1,5 @@
 import express from 'express';
+import { predictStrategy } from './predict-strategy.js';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { ethers } from 'ethers';
@@ -156,6 +157,7 @@ for (const [path, pricing] of Object.entries(PRICES)) {
   });
 }
 
+app.post('/predict-strategy', predictStrategy);
 app.get('/health', (req, res) => {
   res.json({
     status: 'operational',

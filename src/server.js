@@ -34,6 +34,7 @@ const PRICES = {
   '/solve/sensitivity': { price: '0.15', raw: 150000n },
   '/solve/prescriptive':{ price: '0.30', raw: 300000n },
   '/solve/validate':    { price: '0.05', raw: 50000n },
+  '/predict-strategy':  { price: '0.80', raw: 800000n },
 };
 
 const SOLVER_MAP = {
@@ -126,6 +127,10 @@ for (const [path, pricing] of Object.entries(PRICES)) {
       console.log(`[ARC] Verified in ${verifyTime}ms: ${verification.amount} USDC from ${verification.from}`);
 
       const solverPath = SOLVER_MAP[path];
+      if (!solverPath) {
+        // Pipeline endpoint — delegate to handler
+        return predictStrategy(req, res);
+      }
       const solverStart = Date.now();
       const solverRes = await fetch(`${OPTIMENGINE_URL}${solverPath}`, {
         method: 'POST',
@@ -157,7 +162,6 @@ for (const [path, pricing] of Object.entries(PRICES)) {
   });
 }
 
-app.post('/predict-strategy', predictStrategy);
 app.get('/health', (req, res) => {
   res.json({
     status: 'operational',

@@ -2,6 +2,7 @@ import express from 'express';
 import { predictStrategy } from './predict-strategy.js';
 import { routeLiquidity } from './route-liquidity.js';
 import { scheduleRobust } from './schedule-robust.js';
+import { packResources } from './pack-resources.js';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { ethers } from 'ethers';
@@ -39,6 +40,7 @@ const PRICES = {
   '/predict-strategy':  { price: '0.80', raw: 800000n },
   '/route-liquidity':   { price: '0.35', raw: 350000n },
   '/schedule-robust':   { price: '0.35', raw: 350000n },
+  '/pack-resources':    { price: '0.25', raw: 250000n },
 };
 
 const SOLVER_MAP = {

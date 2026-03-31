@@ -30,7 +30,7 @@ export async function routeLiquidity(req, res) {
     // Step 1 — Routing (optimal route)
     const t1 = Date.now();
     const routingResult = await callSolver("/optimize_routing", {
-      allow_drop_visits: true, max_solve_time_seconds: 10,
+      allow_drop_visits: true, max_solve_time_seconds: 5,
       ...input.solver_request,
     });
     results.steps.push({ step: "routing", time_ms: Date.now() - t1, status: routingResult.status || "error" });

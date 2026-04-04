@@ -3,6 +3,7 @@ import { predictStrategy } from './predict-strategy.js';
 import { routeLiquidity } from './route-liquidity.js';
 import { scheduleRobust } from './schedule-robust.js';
 import { packResources } from './pack-resources.js';
+import { forecastBasic, riskAnalysis, batchPm, validateDecision } from './pm-endpoints.js';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { ethers } from 'ethers';
@@ -41,6 +42,11 @@ const PRICES = {
   '/route-liquidity':   { price: '0.35', raw: 350000n },
   '/schedule-robust':   { price: '0.35', raw: 350000n },
   '/pack-resources':    { price: '0.25', raw: 250000n },
+  '/forecast-basic':    { price: '0.25', raw: 250000n },
+  '/risk-analysis':     { price: '1.00', raw: 1000000n },
+  '/full-intel':        { price: '3.00', raw: 3000000n },
+  '/batch-pm':          { price: '5.00', raw: 5000000n },
+  '/validate-decision': { price: '0.25', raw: 250000n },
 };
 
 const SOLVER_MAP = {
